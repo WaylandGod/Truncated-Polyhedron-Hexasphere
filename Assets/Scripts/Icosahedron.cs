@@ -2,94 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class Helpers
-{
-    public static List<Point> Subdivide(this Point sourcePoint, Point point, int count, Icosahedron.Checker checkPoint)
-    {
-        List<Point> segments = new List<Point>();
-        segments.Add(sourcePoint);
-
-        for (int i = 1; i < count; i++)
-        {
-            float _i = i;
-            var np = new Point(sourcePoint.x * (1 - (_i / count)) + point.x * (_i / count),
-                sourcePoint.y * (1 - (_i / count)) + point.y * (_i / count),
-                sourcePoint.z * (1 - (_i / count)) + point.z * (_i / count));
-            np = checkPoint(np);
-            segments.Add(np);
-        }
-
-        segments.Add(point);
-        return segments;
-    }
-
-    public static Vector3[] ToUnityVectorsArray(this IEnumerable<Point> points)
-    {
-        var vecList = new List<Vector3>();
-        foreach (var p in points)
-        {
-            vecList.Add(p.ToVector3());
-        }
-        return vecList.ToArray();
-    }
-}
-
-// that looks funny but I need it to keep same references when projection hex to spheres :)
-public class Point
-{
-    Vector3 p;
-
-    public float x
-    {
-        get
-        {
-            return p.x;
-        }
-    }
-
-    public float y
-    {
-        get
-        {
-            return p.y;
-        }
-    }
-
-    public float z
-    {
-        get
-        {
-            return p.z;
-        }
-    }
-
-    public Point(float x, float y, float z)
-    {
-        p.Set(x, y, z);
-    }
-
-
-    public Point(Vector3 vec)
-    {
-        p = vec;
-    }
-
-    public void Set(Vector3 vec)
-    {
-        p = vec;
-    }
-
-    public Vector3 ToVector3()
-    {
-        return p;
-    }
-
-    public override string ToString()
-    {
-        return p.ToString();
-    }
-}
-
 public class Icosahedron : MonoBehaviour
 {
     public delegate Point Checker(Point p);
@@ -101,35 +13,21 @@ public class Icosahedron : MonoBehaviour
     [SerializeField]
     private MeshCollider mCollider;
 
+    [SerializeField]
+    private int numDivisions = 3;
+
+    [SerializeField]
+    private float mDiameter;
+
     private void Start()
     {
         GenerateIcosahedron();
     }
 
-    private struct Face
-    {
-        public readonly List<Point> Points;
-        public Face(Point p1, Point p2, Point p3)
-        {
-            Points = new List<Point>(3);
-            Points.Add(p1);
-            Points.Add(p2);
-            Points.Add(p3);
-        }
-
-        public Vector3 GetCentroid()
-        {
-            return (Points[0].ToVector3() + Points[1].ToVector3() + Points[2].ToVector3()) / 3;
-        }
-    }
-
     private void GenerateIcosahedron()
     {
-        var tao = 1.61803399f;
-        var d = 1;
-        var basicCount = 20;
-
-        var numDivisions = 3;
+        var tao = 1.61803399f; // this is not magic but science
+        var d = mDiameter;
 
         var corners = new Point[12]
         {
@@ -177,7 +75,6 @@ public class Icosahedron : MonoBehaviour
             new Face(corners[9], corners[1], corners[11])
         };
 
-        // We do not need this cause in unity it is not a class but struct. etc the extra
         Checker getPointIfExists = (point) =>
         {
             if (points.Contains(point))
@@ -191,11 +88,9 @@ public class Icosahedron : MonoBehaviour
             }
         };
 
-
         List<Face> newFaces = new List<Face>();
         for (var f = 0; f < faces.Length; f++)
         {
-            // console.log("-0---");
             List<Point> prev = null;
             var bottom = new List<Point>();
             bottom.Add(faces[f].Points[0]);
@@ -219,8 +114,6 @@ public class Icosahedron : MonoBehaviour
             }
         }
 
-
-
         faces = newFaces.ToArray();
 
         HashSet<Point> newPoints = new HashSet<Point>();
@@ -228,15 +121,15 @@ public class Icosahedron : MonoBehaviour
         {
             Vector3 vec = point.ToVector3();
             vec.Normalize();
+            point.Set(vec);
             newPoints.Add(point);
         }
 
         points = newPoints;
 
-        var ps = points.ToUnityVectorsArray();
 
 
-
+        // TEST VISUALIZATION----------------------------------------------
         Mesh mesh = new Mesh();
 
         //verts
@@ -256,11 +149,11 @@ public class Icosahedron : MonoBehaviour
             indices[i] = i;
         }
 
-
         mesh.triangles = indices;
 
         mesh.RecalculateNormals();
         mFilter.mesh = mesh;
-        //  mCollider.sharedMesh = mesh;
+        mCollider.sharedMesh = mesh;
+        // ----------------------------------------------------------------------
     }
 }

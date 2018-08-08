@@ -331,6 +331,8 @@ MonoBehaviour:
   mFilter: {fileID: 1630571424}
   mRenderer: {fileID: 1630571423}
   mCollider: {fileID: 1630571427}
+  numDivisions: 5
+  mDiameter: 2
 --- !u!4 &1630571426
 Transform:
   m_ObjectHideFlags: 0
