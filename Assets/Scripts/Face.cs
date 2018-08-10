@@ -5,6 +5,9 @@ using UnityEngine;
 public class Face
 {
     public readonly List<Point> Points;
+    public Point centroid;
+
+
     public Face(Point p1, Point p2, Point p3, bool registerFace = false)
     {
         Points = new List<Point>(3);
@@ -19,9 +22,15 @@ public class Face
         }
     }
 
-    public Vector3 GetCentroid()
+    public Point GetCentroid()
     {
-        return (Points[0].ToVector3() + Points[1].ToVector3() + Points[2].ToVector3()) / 3;
+        if (centroid != null)
+            return centroid;
+
+        var cent = (Points[0].ToVector3() + Points[1].ToVector3() + Points[2].ToVector3()) / 3;
+
+        centroid = new Point(cent);
+        return centroid;
     }
 
     public Point[] GetOtherPoints(Point p)
@@ -30,7 +39,7 @@ public class Face
         int c = 0;
         foreach (var point in Points)
         {
-            if (point.ToVector3()!=p.ToVector3())
+            if (point.ToVector3() != p.ToVector3())
             {
                 other[c++] = point;
             }

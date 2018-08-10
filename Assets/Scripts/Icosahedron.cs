@@ -129,7 +129,7 @@ public class Icosahedron : MonoBehaviour
         foreach (var point in points)
         {
             Vector3 vec = point.ToVector3();
-          //  vec.Normalize();
+            vec.Normalize();
             point.Set(vec);
             newPoints.Add(point);
         }
@@ -141,7 +141,7 @@ public class Icosahedron : MonoBehaviour
 
         foreach (var p in points)
         {
-            var newTile = new Tile(p, 1);
+            var newTile = new Tile(p, 0.9f);
             this.tiles.Add(newTile);
             this.tileLookup.Add(newTile.centerPoint, newTile);
 
@@ -159,11 +159,11 @@ public class Icosahedron : MonoBehaviour
 
 
       //  faces = new List<Face>();
-      //  faces.AddRange(tiles[15].faces);
+      //  faces.AddRange(tiles[14].faces);
       //  foreach (var n in tiles[15].neighbors)
       //  {
       ////      if (n.faces.Count == tiles[15].faces.Count)
-      //          faces.AddRange(n.faces);
+      //    //      faces.AddRange(n.faces);
       //  }
 
         Mesh mesh = new Mesh();

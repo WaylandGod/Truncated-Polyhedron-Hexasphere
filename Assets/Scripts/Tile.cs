@@ -49,7 +49,7 @@ public class Tile
         for (var f = 0; f < faces.Count; f++)
         {
             // build boundary
-            boundary.Add(new Point(faces[f].GetCentroid()));
+            boundary.Add(faces[f].GetCentroid().segment(centerPoint, hexSize.Value));
 
             // get neighboring tiles
             var otherPoints = faces[f].GetOtherPoints(this.centerPoint);

@@ -62,6 +62,19 @@ public class Point
         return mP.ToString();
     }
 
+    public Point segment(Point point, float percent)
+    {
+        percent = Mathf.Max(0.01f, Mathf.Min(1, percent));
+
+        var x = point.x * (1 - percent) + this.x * percent;
+        var y = point.y * (1 - percent) + this.y * percent;
+        var z = point.z * (1 - percent) + this.z * percent;
+
+        var newPoint = new Point(x, y, z);
+        return newPoint;
+
+    }
+
     public List<Face> getOrderedFaces()
     {
         List<Face> workingArray = new List<Face>();
