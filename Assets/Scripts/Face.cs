@@ -5,8 +5,7 @@ using UnityEngine;
 public class Face
 {
     public readonly List<Point> Points;
-    public Point centroid;
-
+    private Point mCentroid;
 
     public Face(Point p1, Point p2, Point p3, bool registerFace = false)
     {
@@ -24,13 +23,13 @@ public class Face
 
     public Point GetCentroid()
     {
-        if (centroid != null)
-            return centroid;
+        if (mCentroid != null)
+            return mCentroid;
 
         var cent = (Points[0].ToVector3() + Points[1].ToVector3() + Points[2].ToVector3()) / 3;
 
-        centroid = new Point(cent);
-        return centroid;
+        mCentroid = new Point(cent);
+        return mCentroid;
     }
 
     public Point[] GetOtherPoints(Point p)
@@ -48,10 +47,10 @@ public class Face
     }
 
     // adjacent if 2 of the points are the same
-    public bool isAdjacentTo(Face face2)
+    public bool IsAdjacentTo(Face face2)
     {
         var count = 0;
-        for (var i = 0; i < this.Points.Count; i++)
+        for (var i = 0; i < Points.Count; i++)
         {
             for (var j = 0; j < face2.Points.Count; j++)
             {

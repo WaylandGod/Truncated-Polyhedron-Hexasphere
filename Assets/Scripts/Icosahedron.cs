@@ -18,12 +18,11 @@ public class Icosahedron : MonoBehaviour
     [SerializeField]
     private float mDiameter;
 
-    private List<Face> faces;
-    private Point[] corners;
-    private HashSet<Point> points;
-
-    private List<Tile> tiles;
-    private Dictionary<Point, Tile> tileLookup;
+    private List<Face> mFaces;
+    private Point[] mCorners;
+    private HashSet<Point> mPoints;
+    private List<Tile> mTiles;
+    private Dictionary<Vector3, Tile> mTileLookup;
 
     private void Start()
     {
@@ -32,79 +31,83 @@ public class Icosahedron : MonoBehaviour
 
     private void GenerateIcosahedron()
     {
-        var tao = 1.61803399f; // this is not magic but science
-        var d = mDiameter;
+        // this is not magic but science
+        var tao = 1.61803399f;
+        var diameter = mDiameter;
 
-        corners = new Point[12]
+        //Icosahedron vertices
+        mCorners = new Point[12]
         {
-            new Point(d, tao * d, 0),
-            new Point(-d, tao * d, 0),
-            new Point(d,-tao * d,0),
-            new Point(-d,-tao * d,0),
-            new Point(0,d,tao * d),
-            new Point(0,-d,tao * d),
-            new Point(0,d,-tao * d),
-            new Point(0,-d,-tao * d),
-            new Point(tao * d,0,d),
-            new Point(-tao * d,0,d),
-            new Point(tao * d,0,-d),
-            new Point(-tao * d,0,-d)
+            new Point(diameter, tao * diameter, 0),
+            new Point(-diameter, tao * diameter, 0),
+            new Point(diameter,-tao * diameter,0),
+            new Point(-diameter,-tao * diameter,0),
+            new Point(0,diameter,tao * diameter),
+            new Point(0,-diameter,tao * diameter),
+            new Point(0,diameter,-tao * diameter),
+            new Point(0,-diameter,-tao * diameter),
+            new Point(tao * diameter,0,diameter),
+            new Point(-tao * diameter,0,diameter),
+            new Point(tao * diameter,0,-diameter),
+            new Point(-tao * diameter,0,-diameter)
         };
 
-        points = new HashSet<Point>();
-        foreach (var corner in corners)
+        mPoints = new HashSet<Point>();
+        foreach (var corner in mCorners)
         {
-            points.Add(corner);
+            mPoints.Add(corner);
         }
 
+        //Icosahedron faces
         var fArr = new Face[]
         {
-            new Face(corners[0], corners[1], corners[4]),
-            new Face(corners[1], corners[9], corners[4]),
-            new Face(corners[4], corners[9], corners[5]),
-            new Face(corners[5], corners[9], corners[3]),
-            new Face(corners[2], corners[3], corners[7]),
-            new Face(corners[3], corners[2], corners[5]),
-            new Face(corners[7], corners[10], corners[2]),
-            new Face(corners[0], corners[8], corners[10]),
-            new Face(corners[0], corners[4], corners[8]),
-            new Face(corners[8], corners[2], corners[10]),
-            new Face(corners[8], corners[4], corners[5]),
-            new Face(corners[8], corners[5], corners[2]),
-            new Face(corners[1], corners[0], corners[6]),
-            new Face(corners[11], corners[1], corners[6]),
-            new Face(corners[3], corners[9], corners[11]),
-            new Face(corners[6], corners[10], corners[7]),
-            new Face(corners[3], corners[11], corners[7]),
-            new Face(corners[11], corners[6], corners[7]),
-            new Face(corners[6], corners[0], corners[10]),
-            new Face(corners[9], corners[1], corners[11])
+            new Face(mCorners[0], mCorners[1], mCorners[4]),
+            new Face(mCorners[1], mCorners[9], mCorners[4]),
+            new Face(mCorners[4], mCorners[9], mCorners[5]),
+            new Face(mCorners[5], mCorners[9], mCorners[3]),
+            new Face(mCorners[2], mCorners[3], mCorners[7]),
+            new Face(mCorners[3], mCorners[2], mCorners[5]),
+            new Face(mCorners[7], mCorners[10], mCorners[2]),
+            new Face(mCorners[0], mCorners[8], mCorners[10]),
+            new Face(mCorners[0], mCorners[4], mCorners[8]),
+            new Face(mCorners[8], mCorners[2], mCorners[10]),
+            new Face(mCorners[8], mCorners[4], mCorners[5]),
+            new Face(mCorners[8], mCorners[5], mCorners[2]),
+            new Face(mCorners[1], mCorners[0], mCorners[6]),
+            new Face(mCorners[11], mCorners[1], mCorners[6]),
+            new Face(mCorners[3], mCorners[9], mCorners[11]),
+            new Face(mCorners[6], mCorners[10], mCorners[7]),
+            new Face(mCorners[3], mCorners[11], mCorners[7]),
+            new Face(mCorners[11], mCorners[6], mCorners[7]),
+            new Face(mCorners[6], mCorners[0], mCorners[10]),
+            new Face(mCorners[9], mCorners[1], mCorners[11])
         };
 
-        faces = new List<Face>();
-        faces.AddRange(fArr);
+        mFaces = new List<Face>();
+        mFaces.AddRange(fArr);
 
         Checker getPointIfExists = (point) =>
         {
-            if (points.Contains(point))
+            if (mPoints.Contains(point))
             {
                 return point;
             }
             else
             {
-                points.Add(point);
+                mPoints.Add(point);
                 return point;
             }
         };
 
+        //Prepare faces
         List<Face> newFaces = new List<Face>();
-        for (var f = 0; f < faces.Count; f++)
+        for (var f = 0; f < mFaces.Count; f++)
         {
             List<Point> prev = null;
             var bottom = new List<Point>();
-            bottom.Add(faces[f].Points[0]);
-            var left = faces[f].Points[0].Subdivide(faces[f].Points[1], numDivisions, getPointIfExists);
-            var right = faces[f].Points[0].Subdivide(faces[f].Points[2], numDivisions, getPointIfExists);
+            bottom.Add(mFaces[f].Points[0]);
+            var left = mFaces[f].Points[0].Subdivide(mFaces[f].Points[1], numDivisions, getPointIfExists);
+            var right = mFaces[f].Points[0].Subdivide(mFaces[f].Points[2], numDivisions, getPointIfExists);
             for (var i = 1; i <= numDivisions; i++)
             {
                 prev = bottom;
@@ -122,66 +125,75 @@ public class Icosahedron : MonoBehaviour
                 }
             }
         }
+        mFaces = newFaces;
 
-        faces = newFaces;
-
+        //Prepare points
         HashSet<Point> newPoints = new HashSet<Point>();
-        foreach (var point in points)
+        foreach (var point in mPoints)
         {
             Vector3 vec = point.ToVector3();
             vec.Normalize();
-            point.Set(vec);
+            point.Set(vec * diameter);
             newPoints.Add(point);
         }
+        mPoints = newPoints;
+        mTiles = new List<Tile>();
+        mTileLookup = new Dictionary<Vector3, Tile>();
 
-        points = newPoints;
-
-        tiles = new List<Tile>();
-        tileLookup = new Dictionary<Point, Tile>();
-
-        foreach (var p in points)
+        foreach (var p in mPoints)
         {
             var newTile = new Tile(p, 0.9f);
-            this.tiles.Add(newTile);
-            this.tileLookup.Add(newTile.centerPoint, newTile);
-
+            var key = newTile.CenterPoint.ToVector3();
+            if (!mTileLookup.ContainsKey(newTile.CenterPoint.ToVector3()))
+            {
+                mTileLookup[key] = newTile;
+                mTiles.Add(newTile);
+            }
+            else
+            {
+                mTileLookup[key].Boundary.AddRange(newTile.Boundary); //stitching
+            }
         }
 
-        foreach (var t in this.tiles)
+        foreach (var t in this.mTiles)
         {
             var _this = this;
-            t.neighbors = t.neighborIds.Select((f) => tileLookup[f]).ToList();
+            var ret = t.NeighborIds.Select(f => mTileLookup[f.ToVector3()]);
+            t.Neighbors = ret.ToList();
         }
 
-
-
         // TEST VISUALIZATION----------------------------------------------
+        mFaces = new List<Face>();
+        var indFrom = 0;
+        var indTo = 100;
 
+        indFrom = 0;
+        indTo = mTiles.Count;
 
-      //  faces = new List<Face>();
-      //  faces.AddRange(tiles[14].faces);
-      //  foreach (var n in tiles[15].neighbors)
-      //  {
-      ////      if (n.faces.Count == tiles[15].faces.Count)
-      //    //      faces.AddRange(n.faces);
-      //  }
+        for (int i = indFrom; i < indTo; i++)
+        {
+            //CreateTestSpheres(mTiles, i);
+            var b = mTiles[i].Boundary;
+            for (int j = 0; j < b.Count - 2; j++)
+            {
+                mFaces.Add(new Face(b[0], b[j + 1], b[j + 2]));
+            }
+        }
 
         Mesh mesh = new Mesh();
 
-
-
         //verts
-        var verts = new Vector3[3 * faces.Count];
-        for (int i = 0; i < faces.Count; i++)
+        var verts = new Vector3[3 * mFaces.Count];
+        for (int i = 0; i < mFaces.Count; i++)
         {
-            verts[i * 3] = faces[i].Points[0].ToVector3();
-            verts[i * 3 + 1] = faces[i].Points[1].ToVector3();
-            verts[i * 3 + 2] = faces[i].Points[2].ToVector3();
+            verts[i * 3] = mFaces[i].Points[0].ToVector3();
+            verts[i * 3 + 1] = mFaces[i].Points[1].ToVector3();
+            verts[i * 3 + 2] = mFaces[i].Points[2].ToVector3();
         }
         mesh.vertices = verts;
 
         //indices;
-        var indices = new int[3 * faces.Count];
+        var indices = new int[3 * mFaces.Count];
         for (int i = 0; i < indices.Length; ++i)
         {
             indices[i] = i;
@@ -195,10 +207,24 @@ public class Icosahedron : MonoBehaviour
         // ----------------------------------------------------------------------
     }
 
-
-
-
-
-
-
+    private void CreateTestSpheres(IList<Tile> tiles, int i)
+    {
+        // Test Spheres to check hexagons
+        foreach (var p in tiles[i].Boundary)
+        {
+            var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            go.name = i.ToString();
+            go.transform.position = p.ToVector3();
+            go.transform.localScale = Vector3.one * 0.05f;
+        }
+        foreach (var n in tiles[i].Neighbors)
+        {
+            foreach (var po in n.Boundary)
+            {
+                var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                go.transform.position = po.ToVector3();
+                go.transform.localScale = Vector3.one * 0.05f;
+            }
+        }
+    }
 }

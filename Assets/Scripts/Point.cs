@@ -6,11 +6,11 @@ using UnityEngine;
 public class Point
 {
     private Vector3 mP;
-    public List<Face> faces = new List<Face>();
+    public List<Face> Faces = new List<Face>();
 
     public void RegisterFace(Face face)
     {
-        faces.Add(face);
+        Faces.Add(face);
     }
  
     public Point(float x, float y, float z)
@@ -62,7 +62,7 @@ public class Point
         return mP.ToString();
     }
 
-    public Point segment(Point point, float percent)
+    public Point Segment(Point point, float percent)
     {
         percent = Mathf.Max(0.01f, Mathf.Min(1, percent));
 
@@ -72,18 +72,36 @@ public class Point
 
         var newPoint = new Point(x, y, z);
         return newPoint;
-
     }
 
-    public List<Face> getOrderedFaces()
+    public List<Point> Subdivide(Point point,int count, Icosahedron.Checker checkPoint)
+    {
+        var segments = new List<Point>();
+        segments.Add(this);
+
+        for (var j = 1; j < count; j++)
+        {
+            float i = j;
+            var np = new Point(this.x * (1 - (i / count)) + point.x * (i / count),
+                this.y * (1 - (i / count)) + point.y * (i / count),
+                this.z * (1 - (i / count)) + point.z * (i / count));
+            np = checkPoint(np);
+            segments.Add(np);
+        }
+
+        segments.Add(point);
+        return segments;
+    }
+
+    public List<Face> GetOrderedFaces()
     {
         List<Face> workingArray = new List<Face>();
-        workingArray.AddRange(faces);
+        workingArray.AddRange(Faces);
 
         var ret = new List<Face>();
 
         var i = 0;
-        while (i < faces.Count)
+        while (i < Faces.Count)
         {
             if (i == 0)
             {
@@ -96,7 +114,7 @@ public class Point
                 var j = 0;
                 while (j < workingArray.Count && !hit)
                 {
-                    if (workingArray[j].isAdjacentTo(ret[i - 1]))
+                    if (workingArray[j].IsAdjacentTo(ret[i - 1]))
                     {
                         hit = true;
                         ret.Add(workingArray[j]);

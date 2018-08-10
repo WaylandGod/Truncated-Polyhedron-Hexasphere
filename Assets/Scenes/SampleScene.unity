@@ -250,7 +250,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 534669902}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalPosition: {x: 0, y: 0.25, z: -3.43}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -331,8 +331,8 @@ MonoBehaviour:
   mFilter: {fileID: 1630571424}
   mRenderer: {fileID: 1630571423}
   mCollider: {fileID: 1630571427}
-  numDivisions: 3
-  mDiameter: 2
+  numDivisions: 5
+  mDiameter: 10
 --- !u!4 &1630571426
 Transform:
   m_ObjectHideFlags: 0
