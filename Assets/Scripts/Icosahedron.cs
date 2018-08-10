@@ -24,12 +24,18 @@ public class Icosahedron : MonoBehaviour
     private List<Tile> mTiles;
     private Dictionary<Vector3, Tile> mTileLookup;
 
-    private void Start()
+    public IEnumerable<Tile>Tiles
     {
-        GenerateIcosahedron();
+        get
+        {
+            foreach(var tile in mTiles)
+            {
+                yield return tile;
+            }
+        }
     }
 
-    private void GenerateIcosahedron()
+    public void GenerateIcosahedron()
     {
         // this is not magic but science
         var tao = 1.61803399f;
@@ -142,7 +148,7 @@ public class Icosahedron : MonoBehaviour
 
         foreach (var p in mPoints)
         {
-            var newTile = new Tile(p, 0.9f);
+            var newTile = new Tile(p, 0.85f);
             var key = newTile.CenterPoint.ToVector3();
             if (!mTileLookup.ContainsKey(newTile.CenterPoint.ToVector3()))
             {
@@ -161,11 +167,15 @@ public class Icosahedron : MonoBehaviour
             var ret = t.NeighborIds.Select(f => mTileLookup[f.ToVector3()]);
             t.Neighbors = ret.ToList();
         }
+    }
 
+    private void TestRender()
+    {
         // TEST VISUALIZATION----------------------------------------------
+        //*
         mFaces = new List<Face>();
-        var indFrom = 0;
-        var indTo = 100;
+        var indFrom = 50;
+        var indTo = 51;
 
         indFrom = 0;
         indTo = mTiles.Count;
@@ -173,6 +183,9 @@ public class Icosahedron : MonoBehaviour
         for (int i = indFrom; i < indTo; i++)
         {
             //CreateTestSpheres(mTiles, i);
+
+            new GameObject().AddComponent<Hexagon>().Init(mTiles[i]);
+
             var b = mTiles[i].Boundary;
             for (int j = 0; j < b.Count - 2; j++)
             {
@@ -204,7 +217,7 @@ public class Icosahedron : MonoBehaviour
         mesh.RecalculateNormals();
         mFilter.mesh = mesh;
         mCollider.sharedMesh = mesh;
-        // ----------------------------------------------------------------------
+        // ---------------------------------------------------------------------- */
     }
 
     private void CreateTestSpheres(IList<Tile> tiles, int i)

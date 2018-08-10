@@ -97,7 +97,6 @@ public class Point
     {
         List<Face> workingArray = new List<Face>();
         workingArray.AddRange(Faces);
-
         var ret = new List<Face>();
 
         var i = 0;
