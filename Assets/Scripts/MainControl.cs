@@ -2,25 +2,29 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MainControl : MonoBehaviour {
+public class MainControl : MonoBehaviour
+{
+    [SerializeField]
+    InputController mUserInput;
+
     [SerializeField]
     private Icosahedron mIcoSphere;
 
     [SerializeField]
     private Hexagon mHexPrefab;
 
-	void Start () {
+    private List<Hexagon> mTiles;
+
+    private void Start()
+    {
+        mTiles = new List<Hexagon>();
         mIcoSphere.GenerateIcosahedron();
-        foreach(var tile in mIcoSphere.Tiles)
+        foreach (var tile in mIcoSphere.Tiles)
         {
-            var hex = Instantiate(mHexPrefab) as Hexagon;
-            hex.Init(tile,transform);
+            var hexagon = Instantiate(mHexPrefab) as Hexagon;
+            hexagon.Init(tile, transform);
+            mTiles.Add(hexagon);
+            mUserInput.AddTrackingElement(hexagon);
         }
-        
     }
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 }

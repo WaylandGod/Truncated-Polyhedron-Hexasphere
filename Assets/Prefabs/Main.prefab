@@ -39,6 +39,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4983883198736406}
   - component: {fileID: 114208703558595520}
+  - component: {fileID: 114891090852660678}
   m_Layer: 0
   m_Name: Main
   m_TagString: Untagged
@@ -140,6 +141,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 418798585558919498a9c97e2d6aecac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mUserInput: {fileID: 114891090852660678}
   mIcoSphere: {fileID: 114586493622644932}
   mHexPrefab: {fileID: 114206658618810076, guid: ba3a4e049f0a74d43a35d5fe9db4709d,
     type: 2}
@@ -159,3 +161,15 @@ MonoBehaviour:
   mCollider: {fileID: 64139302940499978}
   numDivisions: 3
   mDiameter: 10
+--- !u!114 &114891090852660678
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1794450578707124}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e77aa1d9bfeec845b946926db7523a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mCamera: {fileID: 0}

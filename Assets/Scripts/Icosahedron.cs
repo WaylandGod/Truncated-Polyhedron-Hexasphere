@@ -182,7 +182,7 @@ public class Icosahedron : MonoBehaviour
 
         for (int i = indFrom; i < indTo; i++)
         {
-            //CreateTestSpheres(mTiles, i);
+            CreateTestSpheres(mTiles, i);
 
             new GameObject().AddComponent<Hexagon>().Init(mTiles[i]);
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Hexagon : MonoBehaviour
+public class Hexagon : MonoBehaviour, IInputElement
 {
     [Range(0.0f, 1.0f)]
     public float mAngleAlpha;
@@ -10,12 +10,18 @@ public class Hexagon : MonoBehaviour
     [Range(0.0f, 1.0f)]
     public float mPositionAlpha;
 
+    private float mTargetAngleAlpha;
+    private float mTargetPositionAlpha;
+
     [SerializeField]
     private MeshFilter mFilter;
     [SerializeField]
     private MeshRenderer mRenderer;
     [SerializeField]
     private MeshCollider mCollider;
+
+    [SerializeField]
+    private Transform mTransform;
 
     [SerializeField]
     private float mSelectedOutDistance;
@@ -30,6 +36,16 @@ public class Hexagon : MonoBehaviour
     private Vector3 mNoMousePosition;
     private Quaternion mNoRotation;
     private Quaternion mFlippedRotation;
+
+
+
+    public Collider MainCollider
+    {
+        get
+        {
+            return mCollider;
+        }
+    }
 
     public void Init(Tile tile, Transform parent = null)
     {
@@ -79,21 +95,31 @@ public class Hexagon : MonoBehaviour
         BakeTransformations();
     }
 
-
     private void BakeTransformations()
     {
-        mNoRotation = transform.localRotation;
+        mNoRotation = mTransform.localRotation;
         mFlippedRotation = Quaternion.AngleAxis(180f, mRotationDirection);
-        mNoMousePosition = transform.localPosition;
-        mMouseOverPosition = transform.localPosition - mCenterDirection * mSelectedOutDistance;
+        mNoMousePosition = mTransform.localPosition;
+        mMouseOverPosition = mTransform.localPosition - mCenterDirection * mSelectedOutDistance;
     }
+
+    private bool mIsAnimating;
 
     public void Update()
     {
         var rot = Quaternion.Lerp(mNoRotation, mFlippedRotation, mAngleAlpha);
         var pos = Vector3.Lerp(mNoMousePosition, mMouseOverPosition, mPositionAlpha);
-        transform.localRotation = rot;
-        transform.localPosition = pos;
+        mTransform.localRotation = rot;
+        mTransform.localPosition = pos;
+
+        ProcessSelection(mTargetPositionAlpha, mTargetAngleAlpha);
+    }
+
+    private void ProcessSelection(float targetPos,float targetRot)
+    {
+        if (!mIsAnimating)
+            return;
+        mPositionAlpha = Mathf.Lerp(mPositionAlpha, targetPos, 0.1f);
     }
 
     public void Awake()
@@ -104,5 +130,29 @@ public class Hexagon : MonoBehaviour
     public void OnDestroy()
     {
         Destroy(mHexMesh);
+    }
+
+    public void ProcessMouseOver()
+    {
+        mIsAnimating = true;
+        mTargetPositionAlpha = 1;
+        Debug.Log("Mouse is over me");
+    }
+
+    public void ProcessClick(int mouseIndex)
+    {
+        Debug.Log("I was clicked");
+    }
+
+    public void ProcessDrag()
+    {
+        //Do nothing here
+    }
+
+    public void ProcessMouseLost()
+    {
+        mIsAnimating = true;
+        mTargetPositionAlpha = 0;
+        Debug.Log("I lost the mouse");
     }
 }
