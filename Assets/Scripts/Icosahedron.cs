@@ -13,10 +13,6 @@ public class Icosahedron : MonoBehaviour
     private MeshRenderer mRenderer;
     [SerializeField]
     private MeshCollider mCollider;
-    [SerializeField]
-    private int numDivisions = 1;
-    [SerializeField]
-    private float mDiameter;
 
     private List<Face> mFaces;
     private Point[] mCorners;
@@ -35,11 +31,10 @@ public class Icosahedron : MonoBehaviour
         }
     }
 
-    public void GenerateIcosahedron()
+    public void GenerateIcosahedron(float diameter, int numDivisions)
     {
         // this is not magic but science
         var tao = 1.61803399f;
-        var diameter = mDiameter;
 
         //Icosahedron vertices
         mCorners = new Point[12]
@@ -163,7 +158,6 @@ public class Icosahedron : MonoBehaviour
 
         foreach (var t in this.mTiles)
         {
-            var _this = this;
             var ret = t.NeighborIds.Select(f => mTileLookup[f.ToVector3()]);
             t.Neighbors = ret.ToList();
         }

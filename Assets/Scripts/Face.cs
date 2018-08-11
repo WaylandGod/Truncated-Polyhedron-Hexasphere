@@ -46,7 +46,7 @@ public class Face
         return other;
     }
 
-    // adjacent if 2 of the points are the same
+    // Adjacent if 2 of the points are the same
     public bool IsAdjacentTo(Face face2)
     {
         var count = 0;

@@ -9,17 +9,49 @@ public class InputController : MonoBehaviour
     private Camera mCamera;
 
     private Dictionary<Collider, IInputElement> mInputElements = new Dictionary<Collider, IInputElement>();
+
+    //Drag fields
+    private List<IInputElement> mDraggedElements = new List<IInputElement>();
+    private Vector3 lastScreenPosition;
+    private bool isDragging;
+    //-----------
+    //MouseOver fields
+    private HashSet<IInputElement> blockingElements = new HashSet<IInputElement>();
     private HashSet<IInputElement> mMouseOverElements = new HashSet<IInputElement>();
+
+    private static InputController mInstance;
+
+    public static InputController Instance
+    {
+        get
+        {
+            if (mInstance == null)
+            {
+                mInstance = FindObjectOfType<InputController>();
+                if (mInstance == null)
+                {
+                    mInstance = new GameObject().AddComponent<InputController>();
+                    mInstance.mCamera = Camera.main;
+                }
+            }
+            return mInstance;
+        }
+    }
 
     public void AddTrackingElement(IInputElement inputElement)
     {
-        mInputElements.Add(inputElement.MainCollider, inputElement);
+        mInputElements[inputElement.MainCollider] = inputElement;
     }
 
     public void RemoveTrackingElement(IInputElement inputElement)
     {
         if (mInputElements.ContainsKey(inputElement.MainCollider))
             mInputElements.Remove(inputElement.MainCollider);
+    }
+
+    private void Awake()
+    {
+        mInstance = this;
     }
 
     private void Update()
@@ -34,10 +66,6 @@ public class InputController : MonoBehaviour
         ProcessMouseDrags(1);
     }
 
-    List<IInputElement> mDraggedElements = new List<IInputElement>();
-    private Vector3 lastScreenPosition;
-    private bool isDragging;
-    private float dragAgonyTime = 0.1f;
     private void ProcessMouseDrags(int mouseIndex)
     {
         if (Input.GetMouseButtonDown(mouseIndex))
@@ -67,7 +95,7 @@ public class InputController : MonoBehaviour
             isDragging = false;
         }
 
-        if (Input.GetMouseButton(mouseIndex))
+        if (Input.GetMouseButton(mouseIndex) && isDragging)
         {
             var newScreenPosition = Input.mousePosition;
             if (newScreenPosition != lastScreenPosition)
@@ -101,13 +129,11 @@ public class InputController : MonoBehaviour
         }
     }
 
-    private HashSet<IInputElement> blockingElements = new HashSet<IInputElement>();
     private void ProcessMouseOver()
     {
         Ray ray = mCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit[] hitInfos = Physics.RaycastAll(ray, 100000f);
         List<IInputElement> elements = new List<IInputElement>();
-
 
         if (hitInfos.Length != 0)
         {

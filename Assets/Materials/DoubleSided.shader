@@ -30,7 +30,7 @@
 
 		void vert(inout appdata_full v) {
 			float3 viewDir = WorldSpaceViewDir(v.vertex);
-			v.normal *= dot(normalize(viewDir), v.normal) > 0 ? -1 : 1;
+			v.normal = -v.normal;
 		}
 		UNITY_INSTANCING_BUFFER_START(Props)
 	

@@ -5,7 +5,7 @@ using UnityEngine;
 // that looks funny but I need it to keep same references when projection hex to spheres, cause Unity Vector3 is not reftype
 public class Point
 {
-    private Vector3 mP;
+    private Vector3 mPointCoord;
     public List<Face> Faces = new List<Face>();
 
     public void RegisterFace(Face face)
@@ -15,19 +15,19 @@ public class Point
  
     public Point(float x, float y, float z)
     {
-        mP.Set(x, y, z);
+        mPointCoord.Set(x, y, z);
     }
 
     public Point(Vector3 vec)
     {
-        mP = vec;
+        mPointCoord = vec;
     }
 
     public float x
     {
         get
         {
-            return mP.x;
+            return mPointCoord.x;
         }
     }
 
@@ -35,7 +35,7 @@ public class Point
     {
         get
         {
-            return mP.y;
+            return mPointCoord.y;
         }
     }
 
@@ -43,23 +43,23 @@ public class Point
     {
         get
         {
-            return mP.z;
+            return mPointCoord.z;
         }
     }
 
     public void Set(Vector3 vec)
     {
-        mP = vec;
+        mPointCoord = vec;
     }
 
     public Vector3 ToVector3()
     {
-        return mP;
+        return mPointCoord;
     }
 
     public override string ToString()
     {
-        return mP.ToString();
+        return mPointCoord.ToString();
     }
 
     public Point Segment(Point point, float percent)

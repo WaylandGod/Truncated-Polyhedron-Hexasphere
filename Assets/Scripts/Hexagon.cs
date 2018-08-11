@@ -4,14 +4,12 @@ using UnityEngine;
 
 public class Hexagon : MonoBehaviour, IInputElement
 {
+    [SerializeField]
     [Range(0.0f, 1.0f)]
-    public float mRotationAlpha;
-
+    private float mRotationAlpha;
+    [SerializeField]
     [Range(0.0f, 1.0f)]
-    public float mPositionAlpha;
-
-    private float mTargetAngleAlpha;
-    private float mTargetPositionAlpha;
+    private float mPositionAlpha;
 
     [SerializeField]
     private MeshFilter mFilter;
@@ -19,15 +17,18 @@ public class Hexagon : MonoBehaviour, IInputElement
     private MeshRenderer mRenderer;
     [SerializeField]
     private MeshCollider mCollider;
-
     [SerializeField]
     private Transform mTransform;
-
     [SerializeField]
     private float mSelectedOutDistance;
+    [SerializeField]
+    [Range(0f, 1f)]
+    private float mAnimationSpeed;
 
-    private Vector3 mCenterDirection;
-    private Vector3 mRotationDirection;
+    private Vector3 mCenterDirection;       //direction to sphere center
+    private Vector3 mRotationDirection;     //the vector in local coords to rotate around
+    private float mTargetRotationAlpha;
+    private float mTargetPositionAlpha;
 
     private Mesh mHexMesh;
     private Transform mParent;
@@ -36,6 +37,9 @@ public class Hexagon : MonoBehaviour, IInputElement
     private Vector3 mNoMousePosition;
     private Quaternion mNoRotation;
     private Quaternion mFlippedRotation;
+    private bool mIsAnimating;
+    private bool mIsFlipped;
+    private bool mIsPushed;
 
     public Collider MainCollider
     {
@@ -45,12 +49,64 @@ public class Hexagon : MonoBehaviour, IInputElement
         }
     }
 
+    public bool IsFlipped
+    {
+        get
+        {
+            return mIsFlipped;
+        }
+        set
+        {
+            if (value != mIsFlipped)
+            {
+                switch (value)
+                {
+                    case true:
+                        mTargetRotationAlpha = 1;
+                        mIsAnimating = true;
+                        break;
+                    case false:
+                        mTargetRotationAlpha = 0;
+                        mIsAnimating = true;
+                        break;
+                }
+                mIsFlipped = value;
+            }
+        }
+    }
+
+    public bool IsPushed
+    {
+        get
+        {
+            return mIsPushed;
+        }
+        set
+        {
+            if(value !=mIsPushed)
+            {
+                switch(value)
+                {
+                    case true:
+                        mTargetPositionAlpha = 1;
+                        mIsAnimating = true;
+                        break;
+                    case false:
+                        mTargetPositionAlpha = 0;
+                        mIsAnimating = true;
+                        break;
+                }
+                mIsPushed = value;
+            }
+        }
+    }
+
     public void Init(Tile tile, Transform parent = null)
     {
         mParent = parent;
         if (parent != null)
         {
-            transform.SetParent(parent);
+            transform.SetParent(mParent);
         }
 
         var pointsList = new List<Vector3>(tile.Boundary.ToUnityVectorsArray());
@@ -90,18 +146,10 @@ public class Hexagon : MonoBehaviour, IInputElement
         mFilter.sharedMesh = mHexMesh;
         mCollider.sharedMesh = mHexMesh;
 
+        InputController.Instance.AddTrackingElement(this);
+
         BakeTransformations();
     }
-
-    private void BakeTransformations()
-    {
-        mNoRotation = mTransform.localRotation;
-        mFlippedRotation = Quaternion.AngleAxis(180f, mRotationDirection);
-        mNoMousePosition = mTransform.localPosition;
-        mMouseOverPosition = mTransform.localPosition - mCenterDirection * mSelectedOutDistance;
-    }
-
-    private bool mIsAnimating;
 
     public void Update()
     {
@@ -110,15 +158,7 @@ public class Hexagon : MonoBehaviour, IInputElement
         mTransform.localRotation = rot;
         mTransform.localPosition = pos;
 
-        ProcessSelection(mTargetPositionAlpha, mTargetAngleAlpha);
-    }
-
-    private void ProcessSelection(float targetPos, float targetRot)
-    {
-        if (!mIsAnimating)
-            return;
-        mPositionAlpha = Mathf.Lerp(mPositionAlpha, targetPos, 0.1f);
-        mRotationAlpha = Mathf.Lerp(mRotationAlpha, targetRot, 0.1f);
+        ProcessAnimations();
     }
 
     public void Awake()
@@ -129,21 +169,19 @@ public class Hexagon : MonoBehaviour, IInputElement
     public void OnDestroy()
     {
         Destroy(mHexMesh);
+        InputController.Instance.RemoveTrackingElement(this);
     }
 
     public bool ProcessMouseOver()
     {
-        Debug.Log("hex mouse over");
-        mIsAnimating = true;
-        mTargetPositionAlpha = 1;
+        IsPushed = true;
         return true;
     }
 
     public bool ProcessClick(int mouseIndex)
     {
-        mIsAnimating = true;
-        mTargetAngleAlpha = mTargetAngleAlpha > 0.5f ? 0 : 1;
-        return true;
+        IsFlipped = !IsFlipped;
+        return false;
     }
 
     public bool ProcessDrag(Vector3 delta)
@@ -153,8 +191,31 @@ public class Hexagon : MonoBehaviour, IInputElement
 
     public void ProcessMouseLost()
     {
-        mIsAnimating = true;
-        mTargetPositionAlpha = 0;
-        Debug.Log("I lost the mouse");
+        IsPushed = false;
+    }
+
+    private void BakeTransformations()
+    {
+        mNoRotation = mTransform.localRotation;
+        mFlippedRotation = Quaternion.AngleAxis(180f, mRotationDirection);
+        mNoMousePosition = mTransform.localPosition;
+        mMouseOverPosition = mTransform.localPosition - mCenterDirection * mSelectedOutDistance;
+    }
+
+    private void ProcessAnimations()
+    {
+        if (!mIsAnimating)
+            return;
+        //check if we should stop animating
+        if (Mathf.Abs(mRotationAlpha - mTargetRotationAlpha) < 0.01)
+            mRotationAlpha = mTargetRotationAlpha;
+        if (Mathf.Abs(mPositionAlpha - mTargetPositionAlpha) < 0.01)
+            mPositionAlpha = mTargetPositionAlpha;
+        if (mRotationAlpha == mTargetRotationAlpha && mPositionAlpha == mTargetPositionAlpha)
+            mIsAnimating = false;
+        //----------------------------------
+        //Animation
+        mPositionAlpha = Mathf.Lerp(mPositionAlpha, mTargetPositionAlpha, 0.05f);
+        mRotationAlpha = Mathf.Lerp(mRotationAlpha, mTargetRotationAlpha, 0.05f);
     }
 }
