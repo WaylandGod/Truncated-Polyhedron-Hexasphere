@@ -30,7 +30,25 @@ public class InputController : MonoBehaviour
     private void ProcessMouse()
     {
         ProcessMouseOver();
+        ProcessMouseClicks();
 
+    }
+
+    private void ProcessMouseClicks()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            Ray ray = mCamera.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hitInfo;
+            if (Physics.Raycast(ray, out hitInfo))
+            {
+                IInputElement element;
+                if (mInputElements.TryGetValue(hitInfo.collider, out element))
+                {
+                    element.ProcessClick(0);
+                }
+            }
+        }
     }
 
     private void ProcessMouseOver()

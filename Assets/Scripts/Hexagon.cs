@@ -5,7 +5,7 @@ using UnityEngine;
 public class Hexagon : MonoBehaviour, IInputElement
 {
     [Range(0.0f, 1.0f)]
-    public float mAngleAlpha;
+    public float mRotationAlpha;
 
     [Range(0.0f, 1.0f)]
     public float mPositionAlpha;
@@ -107,7 +107,7 @@ public class Hexagon : MonoBehaviour, IInputElement
 
     public void Update()
     {
-        var rot = Quaternion.Lerp(mNoRotation, mFlippedRotation, mAngleAlpha);
+        var rot = Quaternion.Lerp(mNoRotation, mFlippedRotation, mRotationAlpha);
         var pos = Vector3.Lerp(mNoMousePosition, mMouseOverPosition, mPositionAlpha);
         mTransform.localRotation = rot;
         mTransform.localPosition = pos;
@@ -115,11 +115,12 @@ public class Hexagon : MonoBehaviour, IInputElement
         ProcessSelection(mTargetPositionAlpha, mTargetAngleAlpha);
     }
 
-    private void ProcessSelection(float targetPos,float targetRot)
+    private void ProcessSelection(float targetPos, float targetRot)
     {
         if (!mIsAnimating)
             return;
         mPositionAlpha = Mathf.Lerp(mPositionAlpha, targetPos, 0.1f);
+        mRotationAlpha = Mathf.Lerp(mRotationAlpha, targetRot, 0.1f);
     }
 
     public void Awake()
@@ -141,7 +142,8 @@ public class Hexagon : MonoBehaviour, IInputElement
 
     public void ProcessClick(int mouseIndex)
     {
-        Debug.Log("I was clicked");
+        mIsAnimating = true;
+        mTargetAngleAlpha = mTargetAngleAlpha > 0.5f ? 0 : 1;
     }
 
     public void ProcessDrag()
