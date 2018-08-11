@@ -8,9 +8,10 @@ public interface IInputElement
     {
         get;
     }
+    // Input elements returns true if it blocks such input behind the element;
 
-    void ProcessMouseOver();
+    bool ProcessMouseOver();
     void ProcessMouseLost();
-    void ProcessClick(int mouseIndex);
-    void ProcessDrag();
+    bool ProcessClick(int mouseIndex);
+    bool ProcessDrag(Vector3 delta);
 }

@@ -37,8 +37,6 @@ public class Hexagon : MonoBehaviour, IInputElement
     private Quaternion mNoRotation;
     private Quaternion mFlippedRotation;
 
-
-
     public Collider MainCollider
     {
         get
@@ -133,22 +131,24 @@ public class Hexagon : MonoBehaviour, IInputElement
         Destroy(mHexMesh);
     }
 
-    public void ProcessMouseOver()
+    public bool ProcessMouseOver()
     {
+        Debug.Log("hex mouse over");
         mIsAnimating = true;
         mTargetPositionAlpha = 1;
-        Debug.Log("Mouse is over me");
+        return true;
     }
 
-    public void ProcessClick(int mouseIndex)
+    public bool ProcessClick(int mouseIndex)
     {
         mIsAnimating = true;
         mTargetAngleAlpha = mTargetAngleAlpha > 0.5f ? 0 : 1;
+        return true;
     }
 
-    public void ProcessDrag()
+    public bool ProcessDrag(Vector3 delta)
     {
-        //Do nothing here
+        return false;
     }
 
     public void ProcessMouseLost()
